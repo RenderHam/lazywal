@@ -33,12 +33,6 @@ blended into the background, `100` = the raw palette color.
 }
 ```
 
-For local development, point `dir` at your checkout instead:
-
-```lua
-{ dir = vim.fn.expand("~/.git/lazywal"), name = "lazywal", lazy = false, priority = 1000 }
-```
-
 ## Configuration
 
 ```lua
@@ -76,8 +70,6 @@ Generated files are parsed as text, never sourced.
 | `:LazywalPreview` | Show the 16 adjusted colors with their percentages |
 | `:LazywalSet color1 80` | Change one percentage live and reapply |
 | `:LazywalReload` | Re-read the generator output and reapply |
-
-`:WalPreview`, `:WalSet`, and `:WalReload` remain as aliases.
 
 The adjusted palette is exported to `g:terminal_color_0..15` so Neovim's terminal
 matches the editor. Highlights are cached in `~/.cache/nvim/lazywal_theme.json`

@@ -148,17 +148,6 @@ function M.setup(opts)
 			M.preview()
 		end, { desc = "Preview the current lazywal palette" })
 
-		-- Short aliases for existing muscle memory.
-		vim.api.nvim_create_user_command("WalReload", function()
-			vim.cmd.LazywalReload()
-		end, { desc = "Alias for :LazywalReload" })
-		vim.api.nvim_create_user_command("WalSet", function(args)
-			vim.cmd.LazywalSet(args.args)
-		end, { nargs = "+", desc = "Alias for :LazywalSet" })
-		vim.api.nvim_create_user_command("WalPreview", function()
-			vim.cmd.LazywalPreview()
-		end, { desc = "Alias for :LazywalPreview" })
-
 		-- Reapply after lazy plugins have defined their own highlights.
 		vim.api.nvim_create_autocmd("User", {
 			pattern = "VeryLazy",
