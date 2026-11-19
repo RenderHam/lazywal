@@ -68,7 +68,7 @@ highlight groups.
 | Category | Roles (default slot) |
 | --- | --- |
 | Base | `bg`=background, `fg`=foreground, `bg_alt`=color8, `subtle`=color8, `selection`=color8 |
-| Syntax | `comment`=color8, `string`=color2, `number`=color3, `constant`=color6, `variable`=foreground, `parameter`=foreground, `property`=foreground, `func`=color4, `keyword`=color5, `operator`=color5, `exception`=color9, `type`=color6, `tag`=color4, `punctuation`=foreground, `special`=color3 |
+| Syntax | `comment`=color8, `string`=color2, `number`=color3, `constant`=color6, `variable`=foreground, `parameter`=foreground, `property`=foreground, `func`=color4, `method`=color4, `keyword`=color5, `operator`=color5, `exception`=color9, `type`=color6, `tag`=color4, `punctuation`=foreground, `special`=color3 |
 | Diagnostics | `error`=color1, `warn`=color3, `info`=color4, `hint`=color6, `ok`=color2 |
 | UI | `search`=color3, `linenr`=color8, `border`=color8, `heading`=color4, `link`=color6, `diff_add`=color2, `diff_change`=color3, `diff_delete`=color1, `menu_sel_fg`=background, `menu_sel_bg`=color4 |
 

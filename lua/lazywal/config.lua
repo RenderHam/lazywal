@@ -24,6 +24,7 @@ M.options = {
 		parameter = "foreground",
 		property = "foreground",
 		func = "color4",
+		method = "color4",
 		keyword = "color5",
 		operator = "color5",
 		exception = "color9",
