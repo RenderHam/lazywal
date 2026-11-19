@@ -4,9 +4,8 @@ A Neovim colorscheme that takes its palette from your wallpaper generator
 ([hellwal](https://github.com/HiImFerris/hellwal) or
 [pywall](https://github.com/pywal/pywal)) instead of hard-coding colors.
 
-Each of the 16 ANSI colors has a **blend percentage toward the background**, so
-you can tame aggressive wallpaper colors without changing their hue: `0` = fully
-blended into the background, `100` = the raw palette color.
+Colors are used **exactly as generated**. You freely choose which palette color
+each logical role (comments, strings, functions, diagnostics, …) uses.
 
 ## Requirements
 
@@ -23,11 +22,7 @@ blended into the background, `100` = the raw palette color.
   priority = 1000,
   config = function()
     require("lazywal").setup({
-      percentages = {
-        color1 = 85, -- errors
-        color2 = 75, -- strings
-        color7 = 100, -- foreground
-      },
+      -- your configuration
     })
   end,
 }
@@ -35,24 +30,47 @@ blended into the background, `100` = the raw palette color.
 
 ## Configuration
 
+`roles` maps a logical role to any of:
+
+- a palette slot: `"color0"` … `"color15"`, `"background"`, `"foreground"`, `"cursor"`
+- a raw hex value: `"#ff0000"`
+
+No blending or percentage adjustment is applied — the selected color is used as-is.
+
 ```lua
 require("lazywal").setup({
-  generator = "auto",          -- "auto" | "hellwal" | "pywall"
-  palette_path = nil,          -- custom path to a generated palette file
-  percentages = {
-    color0 = 100, color1 = 85, color2 = 75, color3 = 85,
-    color4 = 90, color5 = 80, color6 = 80, color7 = 100,
-    color8 = 100, color9 = 85, color10 = 75, color11 = 85,
-    color12 = 90, color13 = 80, color14 = 80, color15 = 100,
+  generator = "auto", -- "auto" | "hellwal" | "pywall"
+  palette_path = nil, -- custom path to a generated palette file
+
+  roles = {
+    comment = "color1",       -- comments use color1
+    string = "color2",
+    func = "color4",
+    error = "color9",         -- bright variant
+    warn = "#ffaa00",         -- raw color override
   },
+
   transparent = false,
   terminal_colors = true,
   styles = { comments = { italic = true } },
+
   overrides = function(colors)
-    return { Comment = { fg = colors.grey, italic = true } }
+    return { Comment = { fg = colors.comment, italic = true } }
   end,
 })
 ```
+
+`overrides` is the final escape hatch and wins over `roles` for individual
+highlight groups.
+
+### Available roles
+
+| Category | Roles (default slot) |
+| --- | --- |
+| Base | `bg`=background, `fg`=foreground, `bg_alt`=color8, `subtle`=color8, `selection`=color8 |
+| Syntax | `comment`=color8, `string`=color2, `number`=color3, `constant`=color6, `variable`=foreground, `parameter`=foreground, `property`=foreground, `func`=color4, `keyword`=color5, `operator`=color5, `exception`=color9, `type`=color6, `tag`=color4, `punctuation`=foreground, `special`=color3 |
+| Diagnostics | `error`=color1, `warn`=color3, `info`=color4, `hint`=color6, `ok`=color2 |
+| UI | `search`=color3, `linenr`=color8, `border`=color8, `heading`=color4, `link`=color6, `diff_add`=color2, `diff_change`=color3, `diff_delete`=color1, `menu_sel_fg`=background, `menu_sel_bg`=color4 |
 
 Palette sources, in order:
 
@@ -67,13 +85,14 @@ Generated files are parsed as text, never sourced.
 
 | Command | Action |
 | --- | --- |
-| `:LazywalPreview` | Show the 16 adjusted colors with their percentages |
-| `:LazywalSet color1 80` | Change one percentage live and reapply |
+| `:LazywalRoles` | Show every role, its configured target, and the resolved color |
+| `:LazywalPreview` | Show the 16 palette slots |
 | `:LazywalReload` | Re-read the generator output and reapply |
 
-The adjusted palette is exported to `g:terminal_color_0..15` so Neovim's terminal
-matches the editor. Highlights are cached in `~/.cache/nvim/lazywal_theme.json`
-and invalidated when the palette file or your options change.
+The palette is exported to `g:lazywal_palette`, the resolved roles to
+`g:lazywal_roles`, and terminal colors to `g:terminal_color_0..15`. Highlights are
+cached in `~/.cache/nvim/lazywal_theme.json` and invalidated when the palette file
+or your options change.
 
 ## License
 

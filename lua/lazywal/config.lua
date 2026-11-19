@@ -5,24 +5,51 @@ M.options = {
 	generator = "auto", --- "auto" | "hellwal" | "pywall"
 	palette_path = nil, --- custom path to a generated palette file
 
-	--- Blend percentage for each ANSI slot: 0 = background, 100 = pure palette color.
-	percentages = {
-		color0 = 100,
-		color1 = 85,
-		color2 = 75,
-		color3 = 85,
-		color4 = 90,
-		color5 = 80,
-		color6 = 80,
-		color7 = 100,
-		color8 = 100,
-		color9 = 85,
-		color10 = 75,
-		color11 = 85,
-		color12 = 90,
-		color13 = 80,
-		color14 = 80,
-		color15 = 100,
+	--- Logical role -> palette slot (`color0`..`color15`, `background`,
+	--- `foreground`, `cursor`) or a raw `#rrggbb` value.
+	roles = {
+		-- Base
+		bg = "background",
+		fg = "foreground",
+		bg_alt = "color8",
+		subtle = "color8",
+		selection = "color8",
+
+		-- Syntax
+		comment = "color8",
+		string = "color2",
+		number = "color3",
+		constant = "color6",
+		variable = "foreground",
+		parameter = "foreground",
+		property = "foreground",
+		func = "color4",
+		keyword = "color5",
+		operator = "color5",
+		exception = "color9",
+		type = "color6",
+		tag = "color4",
+		punctuation = "foreground",
+		special = "color3",
+
+		-- Diagnostics
+		error = "color1",
+		warn = "color3",
+		info = "color4",
+		hint = "color6",
+		ok = "color2",
+
+		-- UI
+		search = "color3",
+		linenr = "color8",
+		border = "color8",
+		heading = "color4",
+		link = "color6",
+		diff_add = "color2",
+		diff_change = "color3",
+		diff_delete = "color1",
+		menu_sel_fg = "background",
+		menu_sel_bg = "color4",
 	},
 
 	transparent = false,
@@ -49,10 +76,6 @@ end
 ---@param opts? lazywal.Config
 function M.setup(opts)
 	M.options = vim.tbl_deep_extend("force", M.options, opts or {})
-	for slot, pct in pairs(M.options.percentages) do
-		local n = tonumber(pct)
-		M.options.percentages[slot] = math.max(0, math.min(100, n or 100))
-	end
 end
 
 --- A stable string describing everything that affects the generated theme.

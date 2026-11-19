@@ -1,5 +1,5 @@
 --- lazywal — a wallpaper-driven colorscheme.
---- Palette comes from hellwal/pywall; each ANSI slot has a blend percentage.
+--- Palette comes from hellwal/pywall; roles decide which color goes where.
 local config = require("lazywal.config")
 local palette_mod = require("lazywal.palette")
 local theme_mod = require("lazywal.theme")
@@ -50,6 +50,7 @@ function M.load()
 	state.palette = palette
 	state.theme = theme
 	vim.g.lazywal_palette = palette
+	vim.g.lazywal_roles = theme.roles
 	apply(theme)
 	return theme
 end
@@ -67,24 +68,12 @@ function M.get_theme()
 	return state.theme
 end
 
----@param slot string color0..color15
----@param pct number 0..100
-function M.set_percentage(slot, pct)
-	if not config.get().percentages[slot] then
-		vim.notify("lazywal: unknown slot " .. slot, vim.log.levels.WARN)
-		return
-	end
-	config.get().percentages[slot] = math.max(0, math.min(100, tonumber(pct) or 100))
-	M.load()
-end
-
 function M.preview()
 	local p = state.palette or palette_mod.read(config.get())
 	local lines = {}
 	for i = 0, 15 do
 		local slot = "color" .. i
-		local pct = config.get().percentages[slot] or 100
-		lines[i + 1] = string.format(" %-8s %s  %3d%%", slot, p[slot] or "#------", pct)
+		lines[i + 1] = string.format(" %-8s %s", slot, p[slot] or "#------")
 	end
 
 	local buf = vim.api.nvim_create_buf(false, true)
@@ -114,6 +103,49 @@ function M.preview()
 	end, { buffer = buf, silent = true })
 end
 
+function M.roles_preview()
+	local roles = state.theme and state.theme.roles or {}
+	local configured = config.get().roles or {}
+	local names = vim.tbl_keys(roles)
+	table.sort(names)
+
+	local lines = {}
+	for i, name in ipairs(names) do
+		lines[i] = string.format(
+			" %-14s %-12s %s",
+			name,
+			tostring(configured[name] or ""),
+			roles[name] or "#------"
+		)
+	end
+
+	local buf = vim.api.nvim_create_buf(false, true)
+	vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
+	vim.api.nvim_buf_set_option(buf, "modifiable", false)
+	local win = vim.api.nvim_open_win(buf, true, {
+		relative = "editor",
+		width = 52,
+		height = math.min(#lines, 36),
+		row = 2,
+		col = 2,
+		border = "rounded",
+		title = " lazywal roles ",
+		title_pos = "center",
+	})
+
+	for i, name in ipairs(names) do
+		vim.api.nvim_set_hl(
+			0,
+			"LazywalRolePreview" .. i,
+			{ fg = roles[name] or "#ffffff", bold = true }
+		)
+		vim.api.nvim_buf_add_highlight(buf, -1, "LazywalRolePreview" .. i, i - 1, 29, -1)
+	end
+	vim.keymap.set("n", "q", function()
+		vim.api.nvim_win_close(win, true)
+	end, { buffer = buf, silent = true })
+end
+
 local function maybe_reload()
 	local palette = palette_mod.read(config.get())
 	local previous = state.palette
@@ -135,14 +167,9 @@ function M.setup(opts)
 			vim.notify("lazywal: palette reloaded", vim.log.levels.INFO)
 		end, { desc = "Reload the lazywal palette and reapply highlights" })
 
-		vim.api.nvim_create_user_command("LazywalSet", function(args)
-			local slot, pct = args.args:match("^(%w+)%s+(%d+)$")
-			if not slot then
-				vim.notify("lazywal: usage :LazywalSet color1 80", vim.log.levels.WARN)
-				return
-			end
-			M.set_percentage(slot, pct)
-		end, { nargs = "+", desc = "Set the blend percentage of an ANSI color slot" })
+		vim.api.nvim_create_user_command("LazywalRoles", function()
+			M.roles_preview()
+		end, { desc = "Show which color each lazywal role uses" })
 
 		vim.api.nvim_create_user_command("LazywalPreview", function()
 			M.preview()
