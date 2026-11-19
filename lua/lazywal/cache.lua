@@ -30,6 +30,7 @@ function M.load(key)
 
 	return {
 		highlights = cached.highlights,
+		roles = cached.roles,
 		background = cached.background,
 		foreground = cached.foreground,
 		terminal = terminal,
@@ -42,6 +43,7 @@ function M.save(key, theme)
 	--- vim.fn.json_encode rejects tables with mixed key types, so keep this flat.
 	local serializable = {
 		highlights = theme.highlights,
+		roles = theme.roles,
 		background = theme.background,
 		foreground = theme.roles and theme.roles.fg or theme.foreground,
 		terminal = {},
